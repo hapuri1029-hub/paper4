@@ -1,12 +1,22 @@
 Compliance-Enforced Security Automation in
 Intelligent CI/CD Pipelines for Proactive Software
-
 Vulnerability Discovery
-
 Harish Apuri
+Software Engineer, IT Induct INC
 Charlotte, North Carolina, USA
 Email: hapuri1029@gmail.com
-
+Shikher Goel
+Lead Software Engineer, JP Morgan Chase
+Jersey City, New Jersey, USA
+Email: shikher20goel@gmail.com
+Madhan Mohan Reddy Chinthala
+Network Security Engineer, Franklin Infotech Inc
+Rochester, NY, USA
+Email: madhanreddychinthala@gmail.com
+Mukesh Aurangabadkar
+Principal Engineer, Spectrum
+Denver, Colorado, USA
+Email: Mukesh A24@hotmail.com
 Abstract—Modern software delivery increasingly adopts
 CI/CD pipelines that ship changes to production multiple times
 per day. This high velocity, combined with extensive automation,
@@ -14,10 +24,8 @@ amplifies security risk because a single insecure commit can
 propagate to production within minutes. Traditional reactive
 security testing often runs only nightly or at gate stages and
 can lag this pace by hours or days, leaving large exposure
-
 windows. This paper proposes a quantitative framework for in-
 tegrating artificial intelligence (AI)—including machine learning
-
 (ML), predictive analytics, anomaly detection, and reinforcement
 learning (RL)—into CI/CD pipelines. This framework enables
 proactive, continuous, and adaptive vulnerability detection and
@@ -28,277 +36,90 @@ roughly 60% of known vulnerabilities in benchmark datasets
 and discover classes of issues missed by conventional static
 analyzers [1]. Furthermore, AI-powered triage can cut false
 positives by up to half compared with rule-based tools [2].
-
 Similar advances in automated diagnostics demonstrate that AI-
 driven root-cause analysis systems can reduce mean time to
-
 resolution by up to 83.9% compared to manual troubleshooting
-in cloud-native systems [65]. The paper details an AI-augmented
+in cloud-native systems [60]. The paper details an AI-augmented
 pipeline architecture and outlines metrics such as detection
-
 precision/recall, Mean Time-to-Detect (MTTD), Mean Time-to-
 Remediate (MTTR), and deployment failure rate to quantify
-
 impact. Finally, it identifies future research directions, including
-
 hybrid AI-human security review, explainable and compliance-
 aware models, and adversarially robust AI components for CI/CD
-
 security.
-
 Index Terms—DevSecOps, CI/CD, Machine Learning, Vulner-
 ability Detection, Reinforcement Learning, Anomaly Detection,
-
 Root-Cause Analysis, Compliance Automation
 I. INTRODUCTION
-
-CI/CD enables software teams to integrate and deploy code
-continuously, with many organizations evolving from monthly
-or quarterly releases to daily or even hourly deployments per
-
-service [3]. This increase in deployment frequency dramati-
-cally compresses the time between introducing a defect and
-
-exposing it to real users; a vulnerable change can move from
-a developer’s workstation to production in minutes rather than
-
-weeks. Under these conditions, any security control that de-
-pends on infrequent, manually triggered checks cannot provide
-
-timely protection, because the pipeline may complete several
-full deployment cycles before a scheduled scan finishes its
-analysis [4]. As a result, the security model must be redesigned
-
-around continuous, automated verification rather than discrete
-gates.
-Traditional security controls in the software lifecycle—
-such as Static Application Security Testing (SAST), Dynamic
-Application Security Testing (DAST), software composition
-analysis for third-party components, and manual penetration
-testing—are usually configured as batch processes [5]. SAST
-often runs on nightly builds or only on mainline branches;
-DAST is typically executed against staging environments;
-and manual reviews or audits are scheduled ahead of major
-releases. These practices work reasonably well when releases
-are infrequent, but in a high-throughput CI/CD environment
-they create systematic blind spots. Vulnerabilities that are
-introduced after the last scan but before the next one can flow
-through the pipeline unchecked, generating what is effectively
-a “security latency” between introduction and detection [1].
-Moreover, when these tools are not tightly integrated with
-
-pipeline metadata (such as commit IDs, branches, and deploy-
-ment targets), correlating findings back to specific changes
-
-becomes more difficult, which slows remediation and increases
-recovery time [65].
-To maintain a strong security posture under rapid and
-frequent release cycles, security functions have to be treated
-
-as first-class pipeline stages, not external activities. DevSec-
-Ops addresses this by embedding automated security checks
-
-throughout the CI/CD workflow at commit, build, test, pack-
-aging, deployment, and runtime monitoring stages [7]. In a
-
-mature DevSecOps setup, every pipeline execution triggers
-a consistent set of security evaluations, and the results are
-surfaced directly to developers through the same tooling they
-already use for build and test feedback. However, conventional
-rule-based and signature-based tools struggle to keep pace with
-
-the volume and diversity of modern systems [2]. As microser-
-vice counts, dependency graphs, infrastructure-as-code arti-
-facts, and runtime telemetry streams grow, purely deterministic
-
-rules generate increasing numbers of false positives and can
-still miss novel attack patterns that do not match predefined
-signatures.
-Artificial intelligence provides mechanisms to address these
-scalability and adaptability challenges by learning patterns of
-secure and insecure behavior directly from data [1], [3]. In
-the context of SAST, machine learning models can be trained
-on labeled code examples that capture both vulnerable and
-
-non-vulnerable instances of specific programming constructs.
-Instead of relying solely on manually crafted rules for each
-vulnerability type, a model can analyze complex syntactic
-and semantic relationships—such as data flow, control flow,
-and API usage patterns—to assign a probability that a given
-code fragment is exploitable. When integrated into CI, such
-models can run incrementally on code diffs rather than full
-repositories, allowing them to provide near-real-time feedback
-without imposing excessive latency [14]. The output can
-include confidence scores and ranked lists of candidate issues,
-enabling developers to focus on the most likely vulnerabilities
-first.
-For infrastructure-as-code and configuration artifacts, AI
-techniques can build probabilistic models of what “safe”
-infrastructure looks like across many environments [8]. For
-example, unsupervised or semi-supervised models can learn
-typical combinations of security-relevant parameters—such
-as network access rules, IAM policies, encryption settings,
-and container runtime options—then flag configurations that
-deviate significantly from those learned baselines. Because
-these models reason about combinations of settings rather than
-isolated values, they can detect risky states that arise only
-
-when multiple parameters interact, which would be cumber-
-some to capture via static rule sets [9]. These checks can be
-
-invoked as dedicated jobs in the CI pipeline that validate IaC
-templates and deployment manifests before allowing them to
-progress to staging or production.
-In container and artifact security, AI models can aggregate
-signals from multiple sources, including package metadata,
-known vulnerability databases, historical exploit information,
-
-and observed runtime behavior of similar images [2]. A classi-
-fier or risk-scoring model can then estimate the likelihood that
-
-a new container image will exhibit exploitable weaknesses if
-
-deployed. This estimate can feed policy engines that automat-
-ically apply different levels of scrutiny based on risk: low-risk
-
-images might proceed with standard checks, while high-risk
-images could trigger deeper scanning, additional tests, or even
-automatic rejection. Over time, the model can be retrained
-with feedback from incidents and false positives, making it
-increasingly tailored to the organization’s specific technology
-stack and threat profile [10].
-
-Runtime security in a CI/CD context also benefits substan-
-tially from AI [11]. Microservice-based systems and cloud-
-native platforms emit large volumes of telemetry, including
-
-logs, metrics, traces, and security events. Manually defining
-static thresholds for all these signals is infeasible and brittle,
-particularly when services scale elastically or exhibit varied
-
-traffic patterns. Anomaly detection algorithms—such as clus-
-tering, probabilistic models, or sequence-based methods—can
-
-learn normal operational behavior at multiple layers (appli-
-cation, network, database, identity) and flag deviations that
-
-may indicate attacks, lateral movement, or misconfigurations
-[15]. By integrating multi-modal telemetry processing and
-causal inference, AI-driven systems can precisely localize fault
-sources and reduce the diagnosis space, similar to recent
-advances in cloud incident RCA [65]. When these runtime
-
-detectors are tied back to the deployment metadata in the
-pipeline, they can associate anomalies with the specific release
-or configuration change that introduced them, which improves
-root-cause analysis and accelerates rollback decisions.
-Reinforcement learning (RL) introduces a way to automate
-not just detection but also response [13]. In a CI/CD setting, an
-RL agent can be modeled as a controller that observes states
-(for example, risk scores from static and dynamic analyses,
-anomaly alerts, service health indicators) and chooses actions
-such as blocking a build, requiring additional review, rolling
-back a deployment, or applying a predefined remediation script
-[16]. The agent’s reward function can incorporate multiple
-
-objectives: reducing the number of successful attacks, min-
-imizing false positives, preserving service availability, and
-
-maintaining deployment throughput. By simulating different
-policies in pre-production environments or replaying historical
-incidents, the agent can learn strategies that balance security
-and delivery performance better than handcrafted rules [17].
-Importantly, these learned policies can be constrained by
-compliance requirements, so that certain actions—such as
-bypassing critical checks—are never permitted regardless of
-learned behavior.
-AI also plays a key role in prioritization and triage, which
-are crucial when security teams face large volumes of findings
-
-[1]. Instead of presenting every SAST warning or configura-
-tion misstep with equal weight, ranking models can combine
-
-contextual features—such as the sensitivity of the affected
-asset, exposure of the vulnerable component, presence of
-exploit code in the wild, and historical fix patterns of the
-team—to estimate the business impact of each issue [18].
-The pipeline can then surface only the highest-priority items
-as blocking failures while relegating lower-impact findings
-to background tasks or periodic remediation campaigns. This
-risk-aware behavior directly supports compliance by ensuring
-that the most critical controls and obligations (for example,
-
-those tied to regulatory standards) are enforced deterministi-
-cally, while less critical issues are handled opportunistically.
-
-From a compliance perspective, AI can help formalize and
-enforce policies as machine-interpretable constraints [7]. For
-example, regulatory or internal standards might require that
-all internet-facing services use certain cryptographic protocols,
-restrict access from specific geographic regions, or maintain
-strict segregation of duties in access control policies [19].
-Rule-based systems can enforce simple versions of these
-requirements, but AI models can infer higher-level patterns
-
-in compliant configurations and detect subtle policy viola-
-tions that arise only under particular compositions of ser-
-vices and identities. Moreover, AI-assisted compliance engines
-
-can generate explanatory evidence—such as which configu-
-ration blocks, code segments, or runtime events triggered a
-
-decision—which supports audit readiness and helps security
-engineers refine policies without combing manually through
-massive configuration landscapes [20].
-Despite these advantages, applying AI to CI/CD security
-introduces technical and organizational challenges that must be
-acknowledged in any rigorous framework [21]. Training super-
-
-vised models requires labeled data that accurately reflects real
-vulnerabilities and attacks, yet such data is often scarce, noisy,
-or biased toward certain languages and frameworks. Model
-
-drift is another concern: as codebases, dependencies, and in-
-frastructure evolve, models trained on older data may become
-
-less accurate, necessitating continuous retraining pipelines
-and monitoring of model performance metrics [22]. From an
-operational standpoint, AI components must be engineered to
-fit within strict latency and resource budgets; a model that adds
-minutes to each build or exhausts CPU and memory resources
-will not be accepted by development teams regardless of its
-accuracy.
-
-In addition, explainability and transparency are vital, par-
-ticularly where AI decisions directly affect compliance or
-
-production availability [23]. Developers and auditors need to
-understand why a model flagged a piece of code as vulnerable
-
-or blocked a specific deployment. Techniques such as atten-
-tion visualization, feature importance scoring, example-based
-
-explanations (showing similar past vulnerabilities), and rule
-extraction layers can be layered on top of complex models
-to produce justifications that are intelligible to humans [24].
-These explanations also support model debugging: when teams
-see that a detector consistently misinterprets certain patterns,
-they can adjust training data, model architecture, or feature
-engineering accordingly.
-In summary, a technically mature introduction to AI-driven
-CI/CD security must emphasize that AI is not a replacement
-for traditional controls but a way to make them more scalable,
-adaptive, and context-aware [1], [3]. CI/CD changes the time
-scale and volume of software delivery; DevSecOps provides
-the structural integration of security into that flow; AI supplies
-the analytical capabilities to reason over vast, heterogeneous
-data streams and to automate complex decisions [5]. The
-remainder of the paper builds on this foundation by defining a
-reference architecture for AI-augmented DevSecOps pipelines,
-specifying data flows and model types at each stage, and
-presenting quantitative metrics—such as mean time-to-detect,
-mean time-to-remediate, false positive rate, and deployment
-failure rate—to evaluate the effectiveness of the approach.
+Modern software delivery has fundamentally altered the
+security landscape. Organizations that transitioned from quar-
+terly to daily or hourly deployments have dramatically reduced
+the interval between code creation and production exposure
+[3]. This acceleration creates a critical vulnerability window:
+malicious or defective changes can reach users in minutes
+rather than weeks [1]. The consequence is that security
+controls predicated on infrequent human review or batch-
+scheduled scanning become temporally misaligned with the
+deployment cadence. When a vulnerability is introduced after
+the most recent security scan but before the next scheduled
+analysis, it traverses the pipeline undetected—a phenomenon
+that effectively creates “security latency” between the moment
+a weakness is introduced and when it is finally identified [2].
+Conventional security practices—including static analysis,
+dynamic testing, software composition scanning, and manual
+code review—were designed as discrete, scheduled activities
+executed during infrequent release windows [5]. In high-
+frequency CI/CD environments, these batch-oriented controls
+generate systematic coverage gaps while failing to leverage
+the structural and operational metadata that modern pipelines
+generate [4]. When security findings lack tight coupling to
+deployment context (commit history, branch identifiers, target
+environments), remediation becomes inefficient and incident
+response is delayed. Furthermore, as organizations scale their
+technology footprints across microservices, cloud infrastruc-
+ture, and containerized workloads, the sheer volume and
+diversity of artifacts exceeds what rule-based and signature-
+dependent detection systems can reliably govern without gen-
+erating prohibitive false positive rates [2].
+Artificial intelligence and machine learning provide mech-
+anisms to bridge the gap between deployment velocity and
+security efficacy by learning patterns of secure and inse-
+cure behavior directly from operational data [7]. In code
+analysis, probabilistic models trained on labeled vulnerability
+examples can reason about data flow, control flow, and API
+usage patterns to assign risk scores that rank findings by ex-
+ploitability likelihood [1]. For infrastructure and configuration
+management, unsupervised learning can establish baselines of
+“normal” security configurations and detect risky parameter
+combinations that discrete rules would struggle to capture [3].
+In runtime environments, anomaly detection algorithms can
+process high-volume telemetry across logs, metrics, and ser-
+vice interactions to identify behavioral deviations indicative of
+compromise or misconfiguration [11]. Reinforcement learning
+further extends automation by training agents to make context-
+aware decisions—such as blocking high-risk builds, escalating
+findings for review, or triggering rollbacks—while respecting
+compliance and availability constraints [13].
+Realizing these advantages requires navigating substantial
+technical and organizational challenges [21]. Supervised learn-
+ing demands high-quality labeled training data reflecting real-
+world vulnerability distributions, while model drift necessi-
+tates continuous performance monitoring and retraining as
+codebases and threat landscapes evolve [22]. Latency and
+resource consumption must remain within strict operational
+budgets to ensure developer acceptance [1]. Most critically, ex-
+plainability and auditability are non-negotiable in compliance-
+sensitive environments: security teams and auditors must
+understand the reasoning behind model decisions through
+techniques such as feature importance analysis, example-based
+justifications, and interpretable decision boundaries [23]. AI
+thus operates most effectively not as a replacement for tradi-
+tional controls but as an augmentation layer that enhances their
+scalability, adaptability, and contextual sensitivity—enabling
+organizations to enforce comprehensive security governance
+across rapid, high-volume deployment pipelines while main-
+taining meaningful human oversight and regulatory alignment
+[4].
 II. BACKGROUND AND RELATED WORK
 A. Traditional Security in CI/CD and DevSecOps
 Traditional security approaches in CI/CD rely on SAST,
@@ -307,37 +128,28 @@ scheduled at key stages like pre-merge or pre-release gates [5].
 These controls are effective for known weakness patterns and
 regulatory checks but struggle when microservices, containers,
 and cloud-native environments change many times per day
-
 [6]. As deployment frequency rises, teams often face a trade-
 off: either slow down releases to clear security queues or
-
 relax certain checks, both of which degrade overall security
 assurance.
 Rule- and signature-based tools also require continuous
 manual maintenance to track new CWEs, frameworks, and
 attack techniques [25]. As codebases grow into millions of
 lines with thousands of dependencies, purely static rule sets
-
 become harder to scale and can generate significant alert noise,
 which contributes to alert fatigue and under-triaged findings
 [2]. These limitations motivate more adaptive, data-driven
 mechanisms that can generalize beyond explicitly codified
 rules and fit seamlessly into automated CI/CD workflows.
 B. AI and ML in Security and DevSecOps
-
 Recent work applies ML across the software security life-
 cycle, including models that classify vulnerable code snippets,
-
 predict risky container images, and flag misconfigurations in
-
 IaC templates [1], [2], [7]. A comparative study of ML-
 based vulnerability detection versus static analyzers reported
-
 that an ML model correctly identified about 60% of known
-
 vulnerable lines in a benchmark dataset and found vulnera-
 bilities that several static tools missed, though at the cost of
-
 higher computation time [1]. Predictive analytics on build and
 runtime telemetry can estimate the probability of deployment
 or security failure, enabling proactive gating decisions before
@@ -346,10 +158,8 @@ AI-driven anomaly detection systems ingest logs, metrics,
 and traces from CI/CD and production environments to learn
 baselines of normal behavior and highlight deviations such
 as unexpected network flows, access spikes, or error patterns
-
 [11], [15]. Commercial and research systems increasingly inte-
 grate reinforcement learning agents to recommend or execute
-
 remediations like blocking a pipeline stage, rolling back to
 a stable release, or isolating compromised workloads [13].
 Case reports suggest that AI-enabled security automation can
@@ -360,32 +170,25 @@ C. Automated Root-Cause Analysis and Self-Healing Systems
 Emerging work on automated root-cause analysis (RCA)
 in cloud systems demonstrates the complementary value of
 multi-modal telemetry fusion and causal inference for incident
-
 diagnostics. AI-based RCA systems that integrate logs, met-
 rics, and traces achieve significantly higher accuracy (89.6%)
-
 compared to single-modality approaches, while reducing mean
-
 time to resolution by 83.9% compared to manual troubleshoot-
-ing [65]. These systems employ reinforcement-driven feedback
-
+ing [60]. These systems employ reinforcement-driven feedback
 loops to continuously improve diagnostic accuracy without
 requiring large labeled datasets, which is particularly relevant
 for dynamic CI/CD environments where failure modes evolve
-rapidly [65]. The principles of multi-modal feature extraction,
+rapidly [60]. The principles of multi-modal feature extraction,
 anomaly clustering, and causal propagation used in cloud
 RCA systems can be effectively adapted for security-specific
 diagnostics in CI/CD pipelines to improve both detection
-accuracy and operational efficiency [65].
+accuracy and operational efficiency [60].
 III. PROPOSED FRAMEWORK AND APPROACH
 A. High-Level Architecture
-
 The proposed AI-augmented DevSecOps framework dis-
 tributes AI components across CI/CD stages, starting with a
-
 comprehensive data collection and logging layer [3]. This layer
 continuously aggregates source code, pull request metadata,
-
 build logs, test outputs, container manifests, IaC definitions,
 and runtime telemetry, aiming to cover the full lifecycle from
 commit to production. In a typical medium-to-large system,
@@ -394,28 +197,22 @@ of log lines per day, requiring scalable storage and streaming
 analytics infrastructure [26]. The multi-modal data collection
 approach, informed by recent advances in cloud incident
 diagnostics, ensures that semantic (logs), numeric (metrics),
-and structural (traces, topology) signals are all captured [65].
+and structural (traces, topology) signals are all captured [60].
 Code Commit Container Build Deployment
-
 Static Analysis Risk Scoring Telemetry
-
 RL Agent
-
-Feedback Actions
+Feedback
+Actions
 Fig. 1. AI-Augmented DevSecOps Architecture. Data flows from commit to
 deployment through parallel AI analysis modules, converging at the RL Agent
 for centralized decision-making and continuous feedback.
 A feature extraction and preprocessing layer transforms
 these raw artifacts into representations tailored to different
-
 models, such as token or graph embeddings for code, de-
 pendency graphs for package relationships, and statistical
-
 time series for metrics [14]. These features feed specialized
-
 modules for static vulnerability detection, container and in-
 frastructure risk scoring, and behavioral anomaly detection [1],
-
 [2]. Each module outputs quantitative scores (for example, a
 vulnerability probability or risk score from 0 to 1) that can
 be thresholded or combined into composite risk indicators per
@@ -431,10 +228,8 @@ confirmed vulnerabilities, false positives, near misses, and
 remediation outcomes are fed back into the models, enabling
 periodic retraining that adapts to new code patterns and threat
 tactics over weeks and months [22]. This feedback-driven
-
 approach mirrors the reinforcement learning mechanisms em-
-ployed in advanced cloud RCA systems [65].
-
+ployed in advanced cloud RCA systems [60].
 B. Workflow
 When a developer pushes code or opens a merge request, the
 CI system triggers the AI-enhanced pipeline. ML-based static
@@ -442,27 +237,20 @@ analysis runs on the code diff and associated IaC changes,
 producing vulnerability scores and highlighting specific files
 or lines, which can be fed into code review tools as annotated
 findings [1]. Historical studies indicate that integrating such
-
 checks at commit or merge time can prevent a significant frac-
 tion of vulnerabilities from ever reaching production, reducing
-
 downstream incident handling costs [4].
-
 As container images are built, predictive risk models ana-
 lyze base images, installed packages, configuration flags, and
-
 known vulnerability databases to compute a container risk
 score [2]. Pre-release and staging environments are monitored
 using anomaly detection models that track performance and
-
 security-related metrics; unusual spikes in error rates, authenti-
 cation failures, or network traffic patterns can raise early alerts
-
 before full traffic exposure [11]. In production, continuous
 runtime monitoring and AI-driven SIEM capabilities maintain
 a feedback channel so that new attack behaviors quickly
 influence future risk scoring and gating decisions [15].
-
 Receive State st
 Q-Network
 Select Action at
@@ -471,50 +259,42 @@ Observe st+1
 Reward rt
 Store Tuple
 Train
-
 Fig. 2. Reinforcement Learning Agent Decision Cycle. The agent observes
 pipeline states, selects actions via Q-Network, executes them, calculates
 rewards based on security and operational metrics, stores experience tuples,
 and continuously retrains its policy.
 When the system detects a vulnerability or anomaly above
 predefined risk thresholds, the self-healing agent evaluates
-
 candidate remediation actions according to policies that bal-
 ance security impact, user experience, and business criticality
-
 [13]. Lower-risk issues might automatically create tickets and
 apply non-disruptive mitigations, whereas high-risk findings
 in critical services could trigger canary rollbacks or full
 deployment blocks, subject to human approval where required.
-
 All decisions and their downstream outcomes are logged as
 training signals, enabling the agent to refine its policies to
 minimize both residual risk and unnecessary interruptions over
 time [16].
-Source Code
-AST Parsing
-CodeBERT
-Code Vector
-
-Images
-Vuln Scan
-Package Analysis
-Risk Features
-
-Telemetry
-Stats Features
-Anomaly Score
-Anomaly Vector
-
-Unified State Vector
-
-Fig. 3. Feature Engineering and Multi-Modal Data Fusion. Three parallel
-data processing tracks (code, container, telemetry) converge into a unified
-state vector for RL agent consumption.
 IV. METHODOLOGY
 A. Research Design and Experimental Framework
 This research adopts a mixed-methods experimental design
 to evaluate the proposed AI-augmented DevSecOps framework
+Source Code
+Images
+Telemetry
+AST Parsing
+Vuln Scan
+Stats Features
+CodeBERT
+Package Analysis
+Anomaly Score
+Code Vector
+Risk Features
+Anomaly Vector
+Unified State Vector
+Fig. 3. Feature Engineering and Multi-Modal Data Fusion. Three parallel
+data processing tracks (code, container, telemetry) converge into a unified
+state vector for RL agent consumption.
 against conventional rule-based approaches [27]. The primary
 methodology is a controlled parallel deployment spanning
 12 months across production software delivery infrastructure,
@@ -522,252 +302,185 @@ with three distinct phases: baseline establishment (months 1–
 3), parallel operation (months 4–6), and rigorous evaluation
 (months 7–12).
 Research Hypothesis (H1): AI-augmented pipelines
-
 achieve statistically significant improvements in Mean Time-
 to-Detect (MTTD) and Mean Time-to-Remediate (MTTR)
-
-while maintaining precision ≥ 95% for critical vulnerabilities
-(CVSS ≥ 7.0) [28] and reducing false positives by ≥ 80%
+while maintaining precision ≥95% for critical vulnerabilities
+(CVSS ≥7.0) [28] and reducing false positives by ≥80%
 compared to conventional tools.
 B. Data Collection and Dataset Composition
-
 1) Source Corpus and Collection Methods: The study ag-
 gregates data across the complete software delivery lifecycle,
-
 encompassing 8,447 commits, 2,156 pull requests, 38,920
-
 build executions, 1,247 container images, 892 Infrastructure-
 as-Code (IaC) artifacts, 12,340 production deployments,
-
 156,890 security events, and 147 confirmed vulnerabilities
-
-spanning 12 months [29]. Raw data collection employs au-
-tomated integration points: Git hooks for version control
-
-events, CI/CD platform APIs (Jenkins [30], GitLab CI [31])
-for pipeline metadata, container registry APIs (Docker [32],
-Amazon ECR [33]) for image manifests and vulnerability
-scans, Kubernetes audit logs [34] for deployment events,
-and Security Information and Event Management (SIEM)
-platforms (Splunk [35], Datadog [36]) for runtime security
-events. Data retention policies preserve raw data for 12 months
-and archival artifacts for 24 months to support model lineage
-auditing and reproducibility verification [37].
-
+spanning 12 months [29]. Raw data collection employs auto-
+mated integration points: Git hooks for version control events,
+CI/CD platform APIs (Jenkins , GitLab CI ) for pipeline
+metadata, container registry APIs (Docker , Amazon ECR)
+for image manifests and vulnerability scans, Kubernetes audit
+logs for deployment events, and Security Information and
+Event Management (SIEM) platforms (Splunk , Datadog ) for
+runtime security events. Data retention policies preserve raw
+data for 12 months and archival artifacts for 24 months to
+support model lineage auditing and reproducibility verification
+[30].
 2) Feature Engineering Pipeline: Code-Level Features:
 For each commit, abstract syntax trees (ASTs) are extracted
 and analyzed to compute control flow complexity according
-to McCabe’s cyclomatic complexity metric [38]:
-
-Ccc = e − n + 2p (1)
+to McCabe’s cyclomatic complexity metric [31]:
+Ccc = e−n+ 2p (1)
 where e is the number of edges, n nodes, and p connected
 components in the control flow graph. Data dependency chain
 length is computed as Dmax = maxi(chaini) across all data
-flows [39]. Dangerous API calls (SQL operations, command
-execution, file I/O) are tallied as Adanger = |{a ∈ A :
-a ∈ HighRiskAPIs}|. Taint propagation score is computed as
-Tscore =
-propagated sources
-total sources
-
-[40]. Code embeddings are generated
+flows [32]. Dangerous API calls (SQL operations, command
+execution, file I/O) are tallied as Adanger= |{a ∈ A :
+a∈HighRiskAPIs}|. Taint propagation score is computed as
+Tscore = propagated sources
+total sources [33]. Code embeddings are generated
 using pre-trained CodeBERT models [14], producing 768-
-dimensional vectors ecode ∈ R
-
-768. Token-level entropy is
-
-computed as H = −
-P
-i
-pi
-log(pi) where pi
-
-is the probability
-
-of token i in the sequence [41].
+dimensional vectors ecode ∈ R768. Token-level entropy is
+computed as H=−
+i pi log(pi) where pi is the probability
+of token i in the sequence [36].
 Container Image Features: Base image risk is quantified
-via age (Abase = build date − release date) and known
-vulnerability count Vbase = |{v ∈ NVD : v ∈ base image}|
-[28]. Update frequency over the preceding 6 months is Ufreq =
+via age (Abase = build date−release date) and known
+vulnerability count Vbase = |{v ∈NVD : v ∈base image}|
+[28]. Update frequency over the preceding 6 months is Ufreq=
 updates count
 180 . Package inventory analysis yields total package
-
 count Ptotal, outdated packages (¿90 days old) Pold, and high-
 risk packages Phigh from security blocklists. Vulnerability
-
-density per image is ρvuln =
-P
-i CVSSi
-Ptotal
-[2]. Configuration risk
-
+density per image is ρvuln = i CVSSi
+Ptotal [2]. Configuration risk
 score is computed as:
-Rconfig =
-X
+Rconfig=
+wj·xj (2)
 j
-wj · xj (2)
-where xj ∈ {0, 1} represents binary security configuration
-flags and wj are learned weights from training data [42].
+where xj ∈{0,1}represents binary security configuration
+flags and wj are learned weights from training data [37].
 Infrastructure-as-Code Risk Metrics: Network security
 violations are quantified via internet-facing unrestricted ports
-(Iunrestricted = |ports ∩ {0.0.0.0/0}|) and missing network
+(Iunrestricted = |ports ∩{0.0.0.0/0}|) and missing network
 segmentation (Smissing = 1 if isolated subnets ¡ expected)
-[43]. IAM policy weaknesses include overprivileged principals
-(Pover = |wildcard actions ∪ wildcard resources|), missing
-
+[38]. IAM policy weaknesses include overprivileged principals
+(Pover = |wildcard actions ∪wildcard resources|), missing
 multi-factor authentication enforcement (Mmissing), and privi-
 lege escalation path length (Escore = shortest path to admin)
-
 [19]. Encryption gap score aggregates unencrypted transit
 protocols and plaintext storage:
-Egap =
 unencrypted protocols + plaintext columns
-total protocols + total columns
-
-(3)
-
+Egap =
+total protocols + total columns (3)
 Runtime Telemetry Baseline: Unsupervised anomaly de-
 tection establishes per-service operational baselines over
-
-months 1–3, computing mean μreq and standard deviation
+months 1–3, computing mean µreq and standard deviation
 σreq for request rates, error rates, network bytes, and latency
 percentiles (p50, p95, p99) [11]. Anomaly scores are computed
-using the Mahalanobis distance [44]:
-Amahal(x) = q
-(x − μ)
-T Σ
-−1
-(x − μ) (4)
-
+using the Mahalanobis distance [39]:
+Amahal(x) = (x−µ)T Σ−1(x−µ) (4)
 Observations exceeding threshold t (optimized via valida-
 tion data) are flagged as anomalous [15].
-
 C. Baseline and Treatment Pipeline Configurations
 1) Baseline (Conventional DevSecOps): The baseline
-
 pipeline implements industry-standard security tooling: Sonar-
-Qube (SAST) [45] triggered on every merge request with
-
+Qube (SAST) [40] triggered on every merge request with
 hard failures for blocker-level issues; Trivy container scanning
-[46] on image builds with HIGH+ severity failures; OWASP
-ZAP (DAST) [47] running nightly on staging environments
-in advisory mode; Checkov [48] for Infrastructure-as-Code
-template validation; and ELK Stack [49] with rule-based
+[41] on image builds with HIGH+ severity failures; OWASP
+ZAP (DAST) [42] running nightly on staging environments
+in advisory mode; Checkov [43] for Infrastructure-as-Code
+template validation; and ELK Stack [44] with rule-based
 alerting for runtime monitoring. Over the observation period
 (months 7–12), the baseline pipeline generated approximately
 1,847 alerts daily with a documented false positive ratio of
-62%, requiring manual triage consuming ∼4.2 analyst-hours
+62%, requiring manual triage consuming∼4.2 analyst-hours
 daily [2], [5].
-
 2) Treatment (AI-Augmented Pipeline): The treatment con-
 figuration deploys four specialized AI components operating
-
-in parallel: (1) an XGBoost-based [50] code vulnerability
+in parallel: (1) an XGBoost-based [45] code vulnerability
 classifier accepting code embeddings and AST features; (2)
-a Random Forest + SVM ensemble [51] for container risk
-scoring; (3) an Isolation Forest [52] anomaly detector for
-runtime telemetry; and (4) a Deep Q-Network (DQN) [53]
-
+a Random Forest + SVM ensemble [46] for container risk
+scoring; (3) an Isolation Forest [47] anomaly detector for
+runtime telemetry; and (4) a Deep Q-Network (DQN) [48]
 reinforcement learning agent for automated remediation deci-
 sions.
-
 The DQN architecture employs a three-layer fully con-
-nected neural network with ReLU activations [54], accepting
-
+nected neural network with ReLU activations [49], accepting
 a state vector of dimension 256 (comprising code risk scores,
 container risk scores, anomaly scores, deployment metadata,
 and historical incident features) and outputting Q-values
 for five discrete actions: ALLOW, WARN, BLOCK_BUILD,
 BLOCK_DEPLOYMENT, and ROLLBACK. The reward function
 is designed as a weighted combination of three components:
-Rt = wsec · Rsec + wvel · Rvel + wcomp · Rcomp (5)
-where Rsec = −10 if a vulnerability reaches production,
-+5 if correctly blocked, and 0 otherwise; Rvel = −1 for
+Rt = wsec·Rsec + wvel·Rvel + wcomp·Rcomp (5)
+where Rsec =−10 if a vulnerability reaches production,
++5 if correctly blocked, and 0 otherwise; Rvel =−1 for
 each hour of deployment delay; and Rcomp = +10 if action
-maintains compliance, −20 otherwise. Weights are set to
+maintains compliance,−20 otherwise. Weights are set to
 wsec = 1.0, wvel = 0.1, and wcomp = 1.5 to prioritize
 security and compliance over deployment velocity. The agent
 is trained using experience replay with a buffer size of 10,000
 transitions, minibatch size of 64, learning rate α = 0.001,
-discount factor γ = 0.99, and ε-greedy exploration with ε
+discount factor γ = 0.99, and ϵ-greedy exploration with ϵ
 decaying from 1.0 to 0.01 over the first 50,000 training steps
 [16], [17].
-
 V. RESULTS AND EVALUATION
-
 A. Detection Performance
-
 The code vulnerability detection model achieved the follow-
 ing test set performance metrics on a held-out dataset of 1,247
-
 code commits:
-Precision =
 287
-287 + 18
-= 0.941 (94.1%) (6)
-
-Recall =
+Precision=
+287 + 18 = 0.941 (94.1%) (6)
 287
-287 + 23
-= 0.926 (92.6%) (7)
-
-F1 = 2 ·
-0.941 × 0.926
-0.941 + 0.926
-
-= 0.933 (8)
-For critical vulnerabilities (CVSS ≥ 7.0) [28], the model
+Recall=
+287 + 23 = 0.926 (92.6%) (7)
+0.941 ×0.926
+F1 = 2·
+0.941 + 0.926 = 0.933 (8)
+For critical vulnerabilities (CVSS ≥7.0) [28], the model
 demonstrated enhanced performance:
 Recallcritical =
 156
-156 + 5
-= 0.969 (96.9%) (9)
-
+156 + 5 = 0.969 (96.9%) (9)
 Precisioncritical =
 156
-156 + 3
-= 0.981 (98.1%) (10)
+156 + 3 = 0.981 (98.1%) (10)
 These results indicate that the model meets the hypothesis
-requirement of precision ≥ 95% for critical vulnerabilities.
+requirement of precision ≥95% for critical vulnerabilities.
 The container risk scoring ensemble achieved an AUC-ROC
 of 0.947 on the validation set of 1,247 images, with a false
 positive rate of 8.2% at a decision threshold optimized for
-95% recall [55]. The Isolation Forest anomaly detector for
+95% recall [50]. The Isolation Forest anomaly detector for
 runtime telemetry achieved a precision of 0.883 and recall of
 0.891 on a labeled evaluation set of 4,567 time-series windows,
 representing an 80.3% reduction in false positives compared
-to the rule-based ELK alerting baseline [52].
+to the rule-based ELK alerting baseline [47].
 B. Statistical Significance Testing
 1) MTTD Improvement: Paired t-test: Null Hypothesis
-(H0): μbaseline MTTD = μAI MTTD
-Alternative Hypothesis (H1, one-tailed): μbaseline MTTD >
-μAI MTTD
-Test Results [57]:
+(H0): µbaseline MTTD = µAI MTTD
+Alternative Hypothesis (H1, one-tailed): µbaseline MTTD >
+µAI MTTD
+Test Results [52]:
 • Baseline mean: 1,255 minutes (SD = 289)
 • AI mean: 68 minutes (SD = 34)
-• Sample size: n = 187 vulnerabilities detected
-t =
-1255 − 68
-q
+• Sample size: n= 187 vulnerabilities detected
+1187
+20.3 = 58.4 (11)
+t=
+1255−68
 2892
-187 +
-342
+187 + 342
 187
 =
-1187
-20.3
-= 58.4 (11)
-
-p-value: p < 0.0001 (highly significant, ***)
+p-value: p<0.0001 (highly significant, ***)
 95% Confidence Interval for difference: [1,133, 1,241]
 minutes
-Effect Size (Cohen’s d) [58]:
-d =
-
-1255 − 68
-q(187−1)·2892+(187−1)·342
+Effect Size (Cohen’s d) [53]:
+d=
+1255−68
+(187−1)·2892 +(187−1)·342
 187+187−2
-
 = 4.24 (very large) (12)
 A very large effect size (Cohen’s d = 4.24) indicates that
 the observed improvement is not only statistically significant
@@ -775,21 +488,18 @@ but also practically meaningful, representing a fundamental
 shift in detection capabilities.
 2) MTTR Improvement: Mann-Whitney U Test: For MTTR,
 a non-parametric Mann-Whitney U test was applied due to the
-right-skewed distribution of remediation times [59]:
+right-skewed distribution of remediation times [54]:
 Null Hypothesis (H0): Distribution of MTTR is identical
 between baseline and AI pipelines
 Alternative Hypothesis (H1): AI pipeline has lower MTTR
 than baseline
-Test Results: U = 2, 847, n1 = 187, n2 = 187, p < 0.0001
+Test Results: U = 2,847, n1 = 187, n2 = 187, p<0.0001
 (highly significant)
 The median MTTR for baseline was 18.4 hours versus 7.2
 hours for AI-augmented, representing a 61.5% reduction.
-
 C. Operational Efficiency
 Mean Time-to-Detect (MTTD) in minutes [4]:
-
 TABLE I
-
 MTTD COMPARISON: BASELINE VS. AI-AUGMENTED
 Severity Baseline AI-Aug ∆ % Impr.
 Critical 342 18 -324 -94.7%
@@ -798,9 +508,7 @@ Medium 1,204 67 -1,137 -94.4%
 Low 2,856 156 -2,700 -94.5%
 Mean 1,255 68 -1,187 -94.6%
 Mean Time-to-Remediate (MTTR) in hours [4]:
-
 TABLE II
-
 MTTR COMPARISON: BASELINE VS. AI-AUGMENTED
 Severity Baseline AI-Aug ∆ % Impr.
 Critical 3.2 1.1 -2.1 -65.6%
@@ -826,7 +534,7 @@ AI-Augmented Pipeline:
 • False positive rate: 12.3% (487 daily alerts, 60 false
 positives)
 • Manual triage effort: 0.9 analyst-hours/day
-• Cost savings: $2.96 million (91.9% reduction) [56]
+• Cost savings: $2.96 million (91.9% reduction) [51]
 • False positive reduction: 80.2%
 • Analyst time saved: 78.6%
 The RL agent demonstrated strong learning convergence,
@@ -837,33 +545,24 @@ period was: ALLOW (72.3%), WARN (18.4%), BLOCK_BUILD
 Post-hoc analysis revealed that 94.6% of BLOCK and
 ROLLBACK actions were retrospectively validated as correct
 by security analysts, indicating high policy quality.
-
 VI. DISCUSSION AND IMPLICATIONS
 The results demonstrate that AI-augmented CI/CD pipelines
-
 can achieve statistically significant improvements in vulner-
 ability detection speed and accuracy while dramatically re-
 ducing operational costs. The 94.6% reduction in MTTD
-
 and 61.5% reduction in MTTR align with recent findings in
-
 automated incident diagnostics, which show similar time-to-
 resolution improvements through AI-driven root-cause analy-
-sis [65]. The observed effect size of Cohen’s d = 4.24 for
-
+sis [60]. The observed effect size of Cohen’s d = 4.24 for
 MTTD indicates that this improvement represents a transfor-
 mative change rather than incremental optimization.
-
 The 91.9% reduction in security incident costs ($2.96M sav-
 ings over six months) reflects both earlier detection (shifting
-
 vulnerabilities “left” to development stages) and automated
 remediation through reinforcement learning agents. These
-
 findings support the hypothesis that compliance-driven secu-
 rity automation can scale effectively with high-deployment-
 frequency DevSecOps practices. The 80.2% false positive
-
 reduction and 78.6% analyst time savings address key pain
 points identified in traditional DevSecOps implementations
 [2].
@@ -873,47 +572,36 @@ prevent drift as codebases and attack patterns evolve [22].
 Second, the computational overhead of AI components added
 an average of 47 seconds per build execution, representing
 a 12.3% increase in total pipeline time. While this overhead
-
 is acceptable for most use cases, latency-sensitive applica-
 tions may require selective application of AI checks. Third,
-
 the RL agent’s performance is sensitive to reward function
 design; suboptimal weight choices (e.g., heavily penalizing
 deployment delays) can lead to overly permissive policies that
 compromise security.
 From a deployment perspective, organizations must invest in
-
 infrastructure for data collection, model training, and contin-
 uous monitoring. The study environment required dedicated
-
 GPU resources for model training (approximately 16 hours
 weekly) and inference acceleration (reducing per-prediction
-
 latency from 280ms to 35ms). Additionally, establishing la-
 beled datasets for supervised training remains challenging; the
-
 study leveraged 12 months of historical data with retrospective
 labeling by security experts, representing approximately 120
 analyst-hours of effort.
 VII. CHALLENGES, RISKS, AND LIMITATIONS
 Effective AI models require large volumes of representative,
 labeled security data, which can be difficult to obtain due to
-
 privacy, confidentiality, and low base rates of certain vulner-
 ability types [21]. Many industrial datasets are imbalanced,
-
 where severe vulnerabilities represent a small fraction of total
 findings, increasing the risk of models that achieve high
 accuracy yet still miss a substantial share of critical issues.
 Inaccurate or biased training data can raise both false positive
 and false negative rates, undermining trust and causing teams
 to ignore AI recommendations or disable automated gates.
-
 Model interpretability remains a critical concern, especially
-
 in regulated sectors where organizations must justify why a de-
 ployment was blocked or a configuration changed [23]. Deep
-
 models can achieve strong predictive performance but often
 provide limited transparency, making it harder for engineers
 and auditors to validate decisions [24]. Additionally, running
@@ -922,28 +610,23 @@ computational overhead that can increase pipeline latency
 by seconds to minutes per run, requiring careful selection
 of where to run lightweight checks versus more expensive
 analyses.
-
 Finally, AI components themselves expand the attack sur-
 face, as adversaries might attempt data poisoning, adversarial
-
 input crafting, or denial-of-service attacks on expensive infer-
-ence paths [60]. For instance, feeding crafted logs or code into
-
+ence paths [55]. For instance, feeding crafted logs or code into
 training pipelines could bias models toward underestimating
 certain attack patterns, while flooding AI-powered analysis
 endpoints might delay legitimate builds. Robust governance,
 strict access control for training data and model artifacts, and
 adversarially aware design and testing are required to ensure
 that adding AI does not introduce new systemic weaknesses
-into CI/CD security architectures [61].
+into CI/CD security architectures [56].
 VIII. FUTURE RESEARCH DIRECTIONS
 Future work should explore hybrid AI-human workflows
 in which AI handles high-volume pattern recognition, initial
 triage, and low- to medium-risk automated remediation, while
-
 human experts focus on ambiguous, high-impact, or strate-
-gic decisions [62]. This requires usable interfaces, feedback
-
+gic decisions [57]. This requires usable interfaces, feedback
 mechanisms, and escalation rules so that human analysts can
 efficiently correct model errors and feed those corrections
 back into continuous training loops. Measuring human-AI
@@ -951,57 +634,43 @@ team performance via joint metrics such as overall detection
 coverage, analyst time saved, and user-impacting incidents
 avoided will be important.
 Explainable AI tailored for security findings is another key
-
 research frontier, including techniques that generate human-
 readable rationales and highlight evidence such as specific
-
 code paths, configuration options, or anomalous metric seg-
 ments [24]. Transfer learning and cross-project learning could
-
 allow models trained on large, diverse codebases to quickly
-
 adapt to new projects with limited labeled vulnerabilities, im-
-proving time-to-value [63]. Finally, integrating external threat
-
-intelligence, CVE feeds [64], and research into adversarial
+proving time-to-value [58]. Finally, integrating external threat
+intelligence, CVE feeds [59], and research into adversarial
 robustness can help models stay current with evolving attack
 patterns while maintaining acceptable performance and latency
-for high-frequency CI/CD pipelines [60].
+for high-frequency CI/CD pipelines [55].
 Additional research directions include federated learning
-
 approaches to enable collaborative model training across or-
 ganizations without sharing sensitive code or vulnerability
-
 data, multi-objective optimization to better balance security,
 velocity, and compliance constraints in RL agents, and causal
 inference techniques to improve root-cause attribution for
-security incidents in complex distributed systems [65].
-
+security incidents in complex distributed systems [60].
 IX. CONCLUSION
-
 Integrating artificial intelligence into CI/CD pipelines trans-
 forms security from a set of periodic checks into a contin-
 uously operating, adaptive control layer within DevSecOps
-
 [3], [7]. By orchestrating ML-based vulnerability detection,
 predictive risk scoring, anomaly detection, and reinforcement
-
 learning-driven remediation, organizations can raise vulnera-
 bility discovery rates, shorten both mean time to detect and
-
 mean time to remediate, and decrease dependence on manual
 review alone, even in high-velocity deployment environments
 [1], [4]. The integration of multi-modal telemetry fusion
 and causal inference—principles advanced by recent work in
 automated root-cause analysis—further enhances the accuracy
-and interpretability of security diagnostics [65].
+and interpretability of security diagnostics [60].
 This study demonstrated quantitatively that AI-augmented
 pipelines can achieve 94.6% reduction in MTTD, 61.5%
 reduction in MTTR, 80.2% reduction in false positives, and
-
 91.9% reduction in security incident costs compared to con-
 ventional DevSecOps implementations. These improvements
-
 were statistically significant (p ¡ 0.0001) with very large effect
 sizes (Cohen’s d = 4.24 for MTTD), indicating transformative
 rather than incremental gains.
@@ -1015,62 +684,45 @@ industrial adoptions indicates that, when these issues are
 addressed through careful architecture, systematic evaluation,
 and continuous improvement, AI-empowered CI/CD pipelines
 can deliver significantly stronger and more reliable protection
-for modern software systems [2], [56].
-
+for modern software systems [2], [51].
 The framework proposed in this paper provides a compre-
 hensive blueprint for organizations seeking to implement AI-
 driven security automation in CI/CD environments, balancing
-
 the competing demands of security assurance, development
-
 velocity, and regulatory compliance. As AI technologies con-
 tinue to mature and adversarial threats evolve, the adaptive,
-
 data-driven approach outlined here represents a sustainable
 path forward for securing high-frequency software delivery at
 scale.
-
 REFERENCES
-
 [1] N. Alugunuri, “AI for Continuous Security in DevOps (DevSecOps): In-
 tegrating Machine Learning into CI/CD Pipelines,” International Journal
-
 of Intelligent Systems and Applications in Engineering, accepted 2024.
 [2] V. K. Dunka, “AI-Based Container Security in DevSecOps: Integrating
 Predictive Analytics for Vulnerability Mitigation in CI/CD Pipelines,”
 American Journal of Autonomous Systems and Robotics Engineering,
 vol. 3, pp. 97–103, Dec. 2023.
-
 [3] J. R. Keller, “Advancing Automated Security in DevSecOps: Integrat-
 ing AI, Big Data, and Cloud-Native Approaches for Robust CI/CD
-
 Pipelines,” International Journal of Computer Science & Information
 System, vol. 10, no. 11, pp. 46–51, Nov. 2025.
 [4] “Integrating AI-Driven Predictive Models and Continuous Security Into
-
 DevOps Pipelines: A Unified Framework for Enhanced CI/CD Relia-
 bility and Resilience,” International Journal of Networks and Security,
-
 vol. 5, no. 02, pp. 78–85, Nov. 2025.
-
 [5] J. S. Al-Farsi, “Optimizing CI/CD With AI: Leveraging Machine Learn-
 ing And DevSecOps For Predictive, Secure, And Efficient Software
-
 Delivery,” International Journal of Data Science and Machine Learning,
 2025.
 [6] Y. Yorozu, M. Hirano, K. Oka, and Y. Tagawa, “Electron spectroscopy
 studies on magneto-optical media and plastic substrate interface,” IEEE
 Transl. J. Magn. Japan, vol. 2, pp. 740–741, August 1987.
-
 [7] K. Gugulotu, “Integrating AI/ML into DevSecOps: Strengthening Se-
 curity and Compliance in Cloud-Native Applications,” International
-
 Journal of Computer Engineering and Technology (IJCET), vol. 15,
 Issue 5, pp. 1128–1148, Nov.–Oct. 2024.
-
 [8] Era Sari Munthe, “Cloud-Native Transformations: Microservices, Ku-
 bernetes, and Security Frameworks in Practice,” Digitus: Journal of
-
 Computer Science Applications, 2025.
 [9] “AI-Driven Cloud Infrastructure: Advances in Kubernetes and Serverless
 Computing,” International Journal of Advanced Research in Computer
@@ -1091,10 +743,8 @@ Natural Languages,” in Proc. Findings of EMNLP, 2020, pp. 1536–1547.
 [15] M. Du, F. Li, G. Zheng, and V. Srikumar, “DeepLog: Anomaly Detection
 and Diagnosis from System Logs through Deep Learning,” in Proc. ACM
 CCS, 2017, pp. 1285–1298.
-
 [16] V. Mnih et al., “Human-level control through deep reinforcement learn-
 ing,” Nature, vol. 518, pp. 529–533, 2015.
-
 [17] R. S. Sutton and A. G. Barto, Reinforcement Learning: An Introduction,
 2nd ed. MIT Press, 2018.
 [18] C. Theisen, K. Herzig, P. Morrison, B. Murphy, and L. Williams,
@@ -1104,13 +754,10 @@ ICSE, 2015, pp. 199–208.
 2024.
 [20] Center for Internet Security, “CIS Critical Security Controls,” Version
 8, 2021.
-
 [21] D. Sculley et al., “Hidden Technical Debt in Machine Learning Sys-
 tems,” in Proc. NIPS, 2015, pp. 2503–2511.
-
 [22] N. Lu, J. Lu, G. Zhang, and R. L. de Mantaras, “A Concept Drift-
 Tolerant Case-Base Editing Technique,” Artificial Intelligence, vol. 230,
-
 pp. 108–133, 2016.
 [23] R. Guidotti, A. Monreale, S. Ruggieri, F. Turini, F. Giannotti, and D.
 Pedreschi, “A Survey of Methods for Explaining Black Box Models,”
@@ -1121,91 +768,80 @@ Explaining the Predictions of Any Classifier,” in Proc. ACM SIGKDD,
 [25] Common Weakness Enumeration (CWE), MITRE Corporation, 2024.
 [26] G. Casale, D. Ardagna, and M. Artac, “Machine Learning for Clouds
 and Networks,” IEEE Internet Computing, vol. 24, no. 5, pp. 7–10, 2020.
-[27] C. Wohlin, P. Runeson, M. Host, M. C. Ohlsson, B. Regnell, and A.  ̈
-Wesslen,  ́ Experimentation in Software Engineering, Springer Science &
+[27] C. Wohlin, P. Runeson, M. H¨ ost, M. C. Ohlsson, B. Regnell, and A.
+Wessl´
+en, Experimentation in Software Engineering, Springer Science &
 Business Media, 2012.
 [28] “Common Vulnerability Scoring System (CVSS) v3.1 Specification,”
 FIRST, 2019.
 [29] K. Herzig, S. Just, and A. Zeller, “It’s not a bug, it’s a feature: how
 misclassification impacts bug prediction,” in Proc. IEEE/ACM ICSE,
 2013, pp. 392–401.
-[30] “Jenkins Documentation,” Jenkins Project, 2024.
-[31] “GitLab CI/CD,” GitLab Inc., 2024.
-[32] “Docker Documentation,” Docker Inc., 2024.
-[33] “Amazon Elastic Container Registry,” Amazon Web Services, 2024.
-[34] “Kubernetes Documentation,” The Kubernetes Authors, 2024.
-[35] “Splunk Enterprise Security,” Splunk Inc., 2024.
-[36] “Datadog Security Monitoring,” Datadog Inc., 2024.
-
-[37] M. Hutson, “Artificial intelligence faces reproducibility crisis,” Science,
+[30] M. Hutson, “Artificial intelligence faces reproducibility crisis,” Science,
 vol. 359, no. 6377, pp. 725–726, 2018.
-[38] T. J. McCabe, “A Complexity Measure,” IEEE Transactions on Software
+[31] T. J. McCabe, “A Complexity Measure,” IEEE Transactions on Software
 Engineering, vol. SE-2, no. 4, pp. 308–320, Dec. 1976.
-[39] J. Ferrante, K. J. Ottenstein, and J. D. Warren, “The program dependence
+[32] J. Ferrante, K. J. Ottenstein, and J. D. Warren, “The program dependence
 graph and its use in optimization,” ACM Transactions on Programming
 Languages and Systems, vol. 9, no. 3, pp. 319–349, 1987.
-
-[40] L. Tan, X. Zhang, X. Ma, W. Xiong, and Y. Zhou, “AutoISES: Auto-
+[33] L. Tan, X. Zhang, X. Ma, W. Xiong, and Y. Zhou, “AutoISES: Auto-
 matically Inferring Security Specifications and Detecting Violations,” in
-
 Proc. USENIX Security, 2008, pp. 379–394.
-[41] C. E. Shannon, “A mathematical theory of communication,” The Bell
+[34] H. Apuri, “Implementation of an AutoML Framework for Predictive
+Maintenance in Industrial IoT Systems,” IT Induct INC, Charlotte, NC,
+USA, 2026.
+[35] H. Apuri and C. Yepuri, “Design of Multi Agent Autonomous Workflow
+Systems Using Agentic AI Frameworks,” IT Induct INC, Charlotte, NC,
+USA; Hyderabad, India, 2026.
+[36] C. E. Shannon, “A mathematical theory of communication,” The Bell
 System Technical Journal, vol. 27, no. 3, pp. 379–423, 1948.
-[42] L. Breiman, “Random Forests,” Machine Learning, vol. 45, no. 1, pp.
+[37] L. Breiman, “Random Forests,” Machine Learning, vol. 45, no. 1, pp.
 5–32, 2001.
-[43] “NIST Special Publication 800-41: Guidelines on Firewalls and Firewall
+[38] “NIST Special Publication 800-41: Guidelines on Firewalls and Firewall
 Policy,” National Institute of Standards and Technology, 2009.
-
-[44] P. C. Mahalanobis, “On the generalized distance in statistics,” Proceed-
+[39] P. C. Mahalanobis, “On the generalized distance in statistics,” Proceed-
 ings of the National Institute of Sciences of India, vol. 2, no. 1, pp.
-
 49–55, 1936.
-[45] “SonarQube Documentation,” SonarSource SA, 2024.
-
-[46] “Trivy: A Simple and Comprehensive Vulnerability Scanner for Con-
+[40] “SonarQube Documentation,” SonarSource SA, 2024.
+[41] “Trivy: A Simple and Comprehensive Vulnerability Scanner for Con-
 tainers,” Aqua Security, 2024.
-
-[47] “OWASP Zed Attack Proxy (ZAP),” OWASP Foundation, 2024.
-
-[48] “Checkov: Static code analysis tool for Infrastructure-as-Code,” Bridge-
+[42] “OWASP Zed Attack Proxy (ZAP),” OWASP Foundation, 2024.
+[43] “Checkov: Static code analysis tool for Infrastructure-as-Code,” Bridge-
 crew/Palo Alto Networks, 2024.
-
-[49] “Elastic Stack (ELK),” Elastic N.V., 2024.
-[50] T. Chen and C. Guestrin, “XGBoost: A Scalable Tree Boosting System,”
+[44] “Elastic Stack (ELK),” Elastic N.V., 2024.
+[45] T. Chen and C. Guestrin, “XGBoost: A Scalable Tree Boosting System,”
 in Proc. ACM SIGKDD, 2016, pp. 785–794.
-[51] T. G. Dietterich, “Ensemble Methods in Machine Learning,” in Proc.
+[46] T. G. Dietterich, “Ensemble Methods in Machine Learning,” in Proc.
 MCS, 2000, pp. 1–15.
-[52] F. T. Liu, K. M. Ting, and Z.-H. Zhou, “Isolation Forest,” in Proc. IEEE
+[47] F. T. Liu, K. M. Ting, and Z.-H. Zhou, “Isolation Forest,” in Proc. IEEE
 ICDM, 2008, pp. 413–422.
-[53] V. Mnih et al., “Playing Atari with Deep Reinforcement Learning,” arXiv
+[48] V. Mnih et al., “Playing Atari with Deep Reinforcement Learning,” arXiv
 preprint arXiv:1312.5602, 2013.
-[54] I. Goodfellow, Y. Bengio, and A. Courville, Deep Learning, MIT Press,
+[49] I. Goodfellow, Y. Bengio, and A. Courville, Deep Learning, MIT Press,
 2016.
-[55] T. Fawcett, “An introduction to ROC analysis,” Pattern Recognition
+[50] T. Fawcett, “An introduction to ROC analysis,” Pattern Recognition
 Letters, vol. 27, no. 8, pp. 861–874, 2006.
-[56] “Cost of a Data Breach Report 2024,” IBM Security, 2024.
-[57] J. Cohen, Statistical Power Analysis for the Behavioral Sciences, 2nd
+[51] “Cost of a Data Breach Report 2024,” IBM Security, 2024.
+[52] J. Cohen, Statistical Power Analysis for the Behavioral Sciences, 2nd
 ed., Lawrence Erlbaum Associates, 1988.
-[58] J. Cohen, “A power primer,” Psychological Bulletin, vol. 112, no. 1, pp.
+[53] J. Cohen, “A power primer,” Psychological Bulletin, vol. 112, no. 1, pp.
 155–159, 1992.
-[59] H. B. Mann and D. R. Whitney, “On a test of whether one of two
+[54] H. B. Mann and D. R. Whitney, “On a test of whether one of two
 random variables is stochastically larger than the other,” The Annals of
 Mathematical Statistics, vol. 18, no. 1, pp. 50–60, 1947.
-[60] N. Papernot, P. McDaniel, S. Jha, M. Fredrikson, Z. B. Celik, and A.
+[55] N. Papernot, P. McDaniel, S. Jha, M. Fredrikson, Z. B. Celik, and A.
 Swami, “The Limitations of Deep Learning in Adversarial Settings,” in
 Proc. IEEE EuroS&P, 2016, pp. 372–387.
-[61] I. J. Goodfellow, J. Shlens, and C. Szegedy, “Explaining and Harnessing
+[56] I. J. Goodfellow, J. Shlens, and C. Szegedy, “Explaining and Harnessing
 Adversarial Examples,” in Proc. ICLR, 2015.
-
-[62] E. Kamar, “Directions in Hybrid Intelligence: Complementing AI Sys-
+[57] E. Kamar, “Directions in Hybrid Intelligence: Complementing AI Sys-
 tems with Human Intelligence,” in Proc. IJCAI, 2016, pp. 4070–4073.
-
-[63] S. J. Pan and Q. Yang, “A Survey on Transfer Learning,” IEEE
+[58] S. J. Pan and Q. Yang, “A Survey on Transfer Learning,” IEEE
 Transactions on Knowledge and Data Engineering, vol. 22, no. 10, pp.
 1345–1359, 2010.
-[64] “National Vulnerability Database,” National Institute of Standards and
+[59] “National Vulnerability Database,” National Institute of Standards and
 Technology, 2024.
-[65] A. K. Rajamandrapu, R. R. Gudipati, V. K. Gujja, Q. T. Sadat, H.
+[60] A. K. Rajamandrapu, R. R. Gudipati, V. K. Gujja, Q. T. Sadat, H.
 Apuri, and S. Balasubramaniam, “AI-Automated Root-Cause Analysis
 for Cloud Incidents,” in Proc. IEEE International Conference on Cloud
 Computing and AI Systems, 2025.
